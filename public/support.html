@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLOTH DELIVERY Support — Customer Complaints Portal</title>
+  <meta name="description"
+    content="File product complaints, wrong deliveries, or request apparel returns on CLOTH DELIVERY support services.">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <header id="main-header">
+    <div class="logo" id="brand-logo">
+      <a href="index.html">CLOTH DELIVERY</a>
+    </div>
+
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html" id="nav-link-shop">Shop</a></li>
+        <li><a href="support.html" class="active" id="nav-link-support">Support</a></li>
+        <li><a href="admin.html" id="nav-link-admin">Admin Dashboard</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-actions">
+      <!-- <span id="user-display" style="display: none; font-size: 0.9rem; font-weight: 500;"></span> -->
+      <button class="icon-btn" id="auth-btn-toggle" title="Account">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Editorial Hero Banner -->
+  <section class="hero-banner" id="support-hero">
+    <h1>SUPPORT & COMPLAINTS</h1>
+    <p>File a report regarding damaged clothing items or incorrect shipments. Our team reviews submissions within 24
+      hours.</p>
+  </section>
+
+  <!-- Support Portal Layout -->
+  <main class="support-layout" id="support-main-content">
+
+    <!-- Left: Complaint Submission Form (Gated by Auth) -->
+    <section class="form-card" id="complaint-form-wrapper" style="margin: 0; max-width: 100%;">
+      <h2>Submit Support Ticket</h2>
+      <div id="support-alert-container"></div>
+
+      <!-- Login warning if unauthenticated -->
+      <div id="support-auth-gate" style="display: none; text-align: center; padding: 2rem 0;">
+        <p style="margin-bottom: 1.5rem; color: var(--color-text-secondary);">You must be logged in to submit a
+          complaint ticket.</p>
+        <button class="primary-btn" id="support-login-trigger">Sign In / Register</button>
+      </div>
+
+      <!-- Complaint Form -->
+      <form id="complaint-submission-form" style="display: none;" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label" for="complaint-issue-type">Issue Type</label>
+          <select class="form-select" id="complaint-issue-type" required>
+            <option value="" disabled selected>Select an issue...</option>
+            <option value="Wrong Delivery">Wrong Delivery</option>
+            <option value="Damaged Clothes">Damaged Clothes</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="complaint-order-id">Order ID (Optional)</label>
+          <select class="form-select" id="complaint-order-id">
+            <option value="">No specific order / general complaint</option>
+            <!-- Dynamic listing of user's orders -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Issue Details</label>
+          <!-- Custom Rich Text Editor Area -->
+          <div class="rich-text-container">
+            <div class="rich-text-toolbar">
+              <button type="button" class="toolbar-btn" id="editor-bold" title="Bold"><b>B</b></button>
+              <button type="button" class="toolbar-btn" id="editor-italic" title="Italic"><i>I</i></button>
+              <button type="button" class="toolbar-btn" id="editor-underline" title="Underline"><u>U</u></button>
+            </div>
+            <div class="rich-editor" id="rich-editor-content" contenteditable="true"
+              placeholder="Describe your issue with formatting..."></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="complaint-image-proof">Upload Photo Proof (Required for Damaged
+            Clothes)</label>
+          <input type="file" class="form-input" id="complaint-image-proof" accept="image/*">
+        </div>
+
+        <button type="submit" class="primary-btn" id="support-submit-btn">File Ticket</button>
+      </form>
+    </section>
+
+    <!-- Right: Submitted Complaints Log -->
+    <section class="complaints-list-card" id="complaints-log-wrapper">
+      <h2>Your Support Log</h2>
+      <div id="support-log-empty"
+        style="text-align: center; color: var(--color-text-secondary); font-style: italic; padding: 2rem 0;">
+        Sign in to view submitted tickets.
+      </div>
+      <div id="complaints-container" style="display: none; max-height: 500px; overflow-y: auto;">
+        <!-- Filled by support.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="main-footer">
+    <p>&copy; 2026 CLOTH DELIVERY Inc. All rights reserved.</p>
+  </footer>
+
+  <!-- Reusable Auth Modal (Same Overlay as index.html) -->
+  <div class="modal-backdrop" id="auth-modal-backdrop">
+    <div class="auth-card" id="auth-modal-container">
+      <button class="modal-close-btn" id="auth-modal-close" style="top: 1.5rem; right: 1.5rem;"
+        aria-label="Close modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div id="auth-login-pane">
+        <h2>Sign In</h2>
+        <div id="login-alert-container"></div>
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-username">Username</label>
+            <input type="text" class="form-input" id="login-username" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" class="form-input" id="login-password" required>
+          </div>
+          <button type="submit" class="primary-btn" id="login-submit-btn">Login</button>
+        </form>
+        <div class="form-helper">
+          New to CLOTH DELIVERY? <span class="form-link" id="link-switch-signup">Create account</span>
+        </div>
+      </div>
+
+      <div id="auth-signup-pane" style="display: none;">
+        <h2>Register</h2>
+        <div id="signup-alert-container"></div>
+        <form id="signup-form">
+          <div class="form-group">
+            <label class="form-label" for="signup-username">Username</label>
+            <input type="text" class="form-input" id="signup-username" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Password</label>
+            <input type="password" class="form-input" id="signup-password" required>
+          </div>
+          <button type="submit" class="primary-btn" id="signup-submit-btn">Register</button>
+        </form>
+        <div class="form-helper">
+          Already have an account? <span class="form-link" id="link-switch-login">Sign in</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="support.js"></script>
+</body>
+
+</html>

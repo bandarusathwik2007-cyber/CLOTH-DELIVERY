@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLOTH DELIVERY Owner — Protected Admin Control</title>
+  <meta name="description" content="Manage inventory count, register clothing collections, and resolve customer issues in the CLOTH DELIVERY database.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header id="main-header">
+    <div class="logo" id="brand-logo">
+      <a href="index.html">CLOTH DELIVERY</a>
+    </div>
+    
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html" id="nav-link-shop">Shop</a></li>
+        <li><a href="support.html" id="nav-link-support">Support</a></li>
+        <li><a href="admin.html" class="active" id="nav-link-admin">Admin Dashboard</a></li>
+      </ul>
+    </nav>
+    
+    <div class="nav-actions">
+      <span id="user-display" style="display: none; font-size: 0.9rem; font-weight: 500; margin-right: 0.5rem;"></span>
+      <button class="icon-btn" id="admin-logout-btn" title="Sign Out" style="display: none;">
+        <!-- Logout SVG -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Admin Auth Gate (Shown if user is NOT admin) -->
+  <div class="auth-card" id="admin-login-gate" style="display: block; margin-top: 5rem;">
+    <h2>Store Owner Authentication</h2>
+    <p style="text-align: center; color: var(--color-text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+      Please login using your store administrator credentials to view and manage server resources.
+    </p>
+    <div id="admin-login-alert"></div>
+    <form id="admin-login-form">
+      <div class="form-group">
+        <label class="form-label" for="admin-username">Admin Username</label>
+        <input type="text" class="form-input" id="admin-username" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="admin-password">Password</label>
+        <input type="password" class="form-input" id="admin-password" required>
+      </div>
+      <button type="submit" class="primary-btn">Authenticate</button>
+    </form>
+  </div>
+
+  <!-- Protected Admin Panels (Shown ONLY if user is verified admin) -->
+  <main class="admin-dashboard" id="admin-panel-content" style="display: none;">
+    <div class="admin-header">
+      <div>
+        <h1>Store Management</h1>
+        <p style="color: var(--color-text-secondary); font-size: 0.95rem;">Configure clothing collections, edit live variants, and process customer claims.</p>
+      </div>
+      <div class="loader" id="admin-global-loader" style="display: none;"></div>
+    </div>
+
+    <!-- Switch Tabs -->
+    <div class="admin-tabs" id="admin-tabs-list">
+      <button class="tab-btn active" data-tab="inventory" id="tab-btn-inventory">Inventory Controls</button>
+      <button class="tab-btn" data-tab="complaints" id="tab-btn-complaints">Complaints Queue</button>
+      <button class="tab-btn" data-tab="orders" id="tab-btn-orders">Order Placed</button>
+    </div>
+
+    <!-- PANEL 1: INVENTORY CONTROLS (SPLIT LAYOUT) -->
+    <div class="tab-pane active" id="pane-inventory">
+      <div class="admin-split-layout">
+        
+        <!-- Left: Product Ingestion Form -->
+        <section class="inventory-modifier-card" id="product-ingestion-form-container">
+          <h2 style="font-family: var(--font-editorial); font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem;">
+            New Clothing Ingestion
+          </h2>
+          <div id="ingestion-alert-container"></div>
+          
+          <form id="product-ingestion-form" enctype="multipart/form-data">
+            <div class="form-group">
+              <label class="form-label" for="ingest-name">Clothing Title</label>
+              <input type="text" class="form-input" id="ingest-name" placeholder="E.g., Linen Oversized Vest" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="ingest-desc">Description</label>
+              <textarea class="form-input form-textarea" id="ingest-desc" placeholder="Details regarding material, fit, structure..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="ingest-price">Base Price (₹)</label>
+              <input type="number" class="form-input" id="ingest-price" step="0.01" min="0.01" placeholder="99.00" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ingest-image">Product Photography</label>
+              <input type="file" class="form-input" id="ingest-image" accept="image/*" required>
+            </div>
+
+            <!-- Individual Stock entries for sizes S, M, L, XL -->
+            <div class="form-group">
+              <label class="form-label">Initial Variant Stocks</label>
+              <div class="size-stocks-input-grid">
+                <div class="size-stock-field">
+                  <label for="ingest-stock-S">S</label>
+                  <input type="number" class="form-input" id="ingest-stock-S" min="0" value="0" required>
+                </div>
+                <div class="size-stock-field">
+                  <label for="ingest-stock-M">M</label>
+                  <input type="number" class="form-input" id="ingest-stock-M" min="0" value="0" required>
+                </div>
+                <div class="size-stock-field">
+                  <label for="ingest-stock-L">L</label>
+                  <input type="number" class="form-input" id="ingest-stock-L" min="0" value="0" required>
+                </div>
+                <div class="size-stock-field">
+                  <label for="ingest-stock-XL">XL</label>
+                  <input type="number" class="form-input" id="ingest-stock-XL" min="0" value="0" required>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="primary-btn" id="btn-ingest-submit">Register Product</button>
+          </form>
+        </section>
+
+        <!-- Right: Live Inventory Modifier Grid -->
+        <section style="display: flex; flex-direction: column; gap: 1rem;">
+          <h2 style="font-family: var(--font-editorial); font-size: 1.5rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem;">
+            Live Stock Modifier
+          </h2>
+          <div id="live-modifier-alert-container"></div>
+          
+          <div class="inventory-table-container">
+            <table class="admin-table" id="live-inventory-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Size Stock Counts</th>
+                  <th>Price</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body">
+                <!-- Loaded dynamically by admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+      </div>
+    </div>
+
+    <!-- PANEL 2: COMPLAINT MANAGEMENT QUEUE (Severity Sorted) -->
+    <div class="tab-pane" id="pane-complaints">
+      <div id="complaints-queue-alert"></div>
+      <div class="complaints-queue-grid" id="admin-complaints-list">
+        <!-- Loaded dynamically by admin.js -->
+      </div>
+      <div id="admin-complaints-empty" style="display: none; text-align: center; color: var(--color-text-secondary); font-style: italic; padding: 4rem 0;">
+        No active complaints or tickets filed.
+      </div>
+    </div>
+
+    <!-- PANEL 3: ORDER PLACED (Admin Orders Log) -->
+    <div class="tab-pane" id="pane-orders">
+      <div id="admin-orders-alert"></div>
+      <div class="inventory-table-container">
+        <table class="admin-table" id="admin-orders-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>User Account</th>
+              <th>Customer Details</th>
+              <th>Items Purchased</th>
+              <th>Total Price</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-body">
+            <!-- Loaded dynamically by admin.js -->
+          </tbody>
+        </table>
+      </div>
+      <div id="admin-orders-empty" style="display: none; text-align: center; color: var(--color-text-secondary); font-style: italic; padding: 4rem 0;">
+        No orders have been placed on the website.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="main-footer">
+    <p>&copy; 2026 CLOTH DELIVERY Inc. — Protected Admin Area</p>
+  </footer>
+
+  <script src="admin.js"></script>
+</body>
+</html>
