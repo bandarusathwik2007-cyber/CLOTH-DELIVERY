@@ -3,7 +3,17 @@ const { Pool } = require('pg');
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("DATABASE_URL environment variable is missing in .env file!");
+  console.error("DATABASE_URL environment variable is missing!");
+  process.exit(1);
+}
+
+if (!connectionString.startsWith('postgres://') && !connectionString.startsWith('postgresql://')) {
+  console.error("==========================================================================");
+  console.error("CRITICAL ERROR: DATABASE_URL must start with 'postgres://' or 'postgresql://'!");
+  console.error("It looks like you configured a raw hostname instead of a full connection URL.");
+  console.error("Provided value format (masked): " + connectionString.replace(/./g, (char) => ['-','.'].includes(char) ? char : '*'));
+  console.error("Please copy the full Connection String from Neon or Render PostgreSQL dashboard.");
+  console.error("==========================================================================");
   process.exit(1);
 }
 
