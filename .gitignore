@@ -2,4 +2,10 @@ node_modules/
 .env
 *.db
 admin credentials..txt
-public/uploads/
+
+# Ignore user uploads but keep default product images
+public/uploads/*
+!public/uploads/silk_shirt.png
+!public/uploads/cashmere_sweater.png
+!public/uploads/trench_coat.png
+!public/uploads/wool_trousers.png
