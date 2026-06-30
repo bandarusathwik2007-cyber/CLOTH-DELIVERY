@@ -40,7 +40,7 @@ const dbAll = (sql, params = []) => new Promise((resolve, reject) => {
 });
 
 const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
-  db.run(sql, params, function(err) {
+  db.run(sql, params, function (err) {
     if (err) reject(err);
     else resolve(this);
   });
@@ -600,56 +600,6 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
   } catch (err) {
     console.error('Admin fetch orders error:', err);
     res.status(500).json({ error: 'Server error fetching orders list' });
-  }
-});
-
-// Express static middleware handles serving page files like index.html, admin.html, and support.html automatically.
-
-app.get('/api/db-debug', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-
-  let urlDetails = {};
-  try {
-    if (process.env.DATABASE_URL) {
-      const rawUrl = process.env.DATABASE_URL;
-      const maskedUrl = rawUrl.replace(/./g, (char) => {
-        if ([':', '/', '@', '?', '=', '&', '.', '-'].includes(char)) {
-          return char;
-        }
-        return '*';
-      });
-
-      let parsed = {};
-      try {
-        const dbUrl = new URL(rawUrl);
-        parsed = {
-          protocol: dbUrl.protocol,
-          host: dbUrl.hostname,
-          port: dbUrl.port,
-          database: dbUrl.pathname
-        };
-      } catch (e) {
-        parsed = { error: e.message };
-      }
-
-      urlDetails = {
-        maskedUrl,
-        parsed
-      };
-    } else {
-      urlDetails = { error: 'DATABASE_URL env var is empty/missing' };
-    }
-  } catch (e) {
-    urlDetails = { error: 'Failed in debug code: ' + e.message };
-  }
-
-  try {
-    const result = await dbGet('SELECT NOW() AS now');
-    res.json({ success: true, message: 'Database connection successful', urlDetails, serverTime: new Date().toISOString(), dbUrlLength: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0, data: result });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Database query failed', urlDetails, serverTime: new Date().toISOString(), dbUrlLength: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0, error: err.message, stack: err.stack });
   }
 });
 
