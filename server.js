@@ -605,6 +605,15 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
 
 // Express static middleware handles serving page files like index.html, admin.html, and support.html automatically.
 
+app.get('/api/db-debug', async (req, res) => {
+  try {
+    const result = await dbGet('SELECT NOW() AS now');
+    res.json({ success: true, message: 'Database connection successful', data: result });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Database query failed', error: err.message, stack: err.stack });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
