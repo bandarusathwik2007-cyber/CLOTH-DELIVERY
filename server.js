@@ -609,18 +609,36 @@ app.get('/api/db-debug', async (req, res) => {
   let urlDetails = {};
   try {
     if (process.env.DATABASE_URL) {
-      const dbUrl = new URL(process.env.DATABASE_URL);
+      const rawUrl = process.env.DATABASE_URL;
+      const maskedUrl = rawUrl.replace(/./g, (char) => {
+        if ([':', '/', '@', '?', '=', '&', '.', '-'].includes(char)) {
+          return char;
+        }
+        return '*';
+      });
+
+      let parsed = {};
+      try {
+        const dbUrl = new URL(rawUrl);
+        parsed = {
+          protocol: dbUrl.protocol,
+          host: dbUrl.hostname,
+          port: dbUrl.port,
+          database: dbUrl.pathname
+        };
+      } catch (e) {
+        parsed = { error: e.message };
+      }
+
       urlDetails = {
-        protocol: dbUrl.protocol,
-        host: dbUrl.hostname,
-        port: dbUrl.port,
-        database: dbUrl.pathname
+        maskedUrl,
+        parsed
       };
     } else {
       urlDetails = { error: 'DATABASE_URL env var is empty/missing' };
     }
   } catch (e) {
-    urlDetails = { error: 'Failed to parse DATABASE_URL: ' + e.message };
+    urlDetails = { error: 'Failed in debug code: ' + e.message };
   }
 
   try {
