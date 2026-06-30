@@ -606,11 +606,28 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
 // Express static middleware handles serving page files like index.html, admin.html, and support.html automatically.
 
 app.get('/api/db-debug', async (req, res) => {
+  let urlDetails = {};
+  try {
+    if (process.env.DATABASE_URL) {
+      const dbUrl = new URL(process.env.DATABASE_URL);
+      urlDetails = {
+        protocol: dbUrl.protocol,
+        host: dbUrl.hostname,
+        port: dbUrl.port,
+        database: dbUrl.pathname
+      };
+    } else {
+      urlDetails = { error: 'DATABASE_URL env var is empty/missing' };
+    }
+  } catch (e) {
+    urlDetails = { error: 'Failed to parse DATABASE_URL: ' + e.message };
+  }
+
   try {
     const result = await dbGet('SELECT NOW() AS now');
-    res.json({ success: true, message: 'Database connection successful', data: result });
+    res.json({ success: true, message: 'Database connection successful', urlDetails, data: result });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Database query failed', error: err.message, stack: err.stack });
+    res.status(500).json({ success: false, message: 'Database query failed', urlDetails, error: err.message, stack: err.stack });
   }
 });
 
