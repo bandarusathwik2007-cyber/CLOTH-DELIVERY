@@ -606,6 +606,10 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
 // Express static middleware handles serving page files like index.html, admin.html, and support.html automatically.
 
 app.get('/api/db-debug', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   let urlDetails = {};
   try {
     if (process.env.DATABASE_URL) {
