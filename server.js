@@ -643,9 +643,9 @@ app.get('/api/db-debug', async (req, res) => {
 
   try {
     const result = await dbGet('SELECT NOW() AS now');
-    res.json({ success: true, message: 'Database connection successful', urlDetails, data: result });
+    res.json({ success: true, message: 'Database connection successful', urlDetails, serverTime: new Date().toISOString(), dbUrlLength: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0, data: result });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Database query failed', urlDetails, error: err.message, stack: err.stack });
+    res.status(500).json({ success: false, message: 'Database query failed', urlDetails, serverTime: new Date().toISOString(), dbUrlLength: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0, error: err.message, stack: err.stack });
   }
 });
 
